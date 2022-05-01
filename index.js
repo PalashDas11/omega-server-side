@@ -22,9 +22,14 @@ async function run() {
    try{
     await client.connect();
     const inventoryCollecttion = client.db("groceryStore").collection("inventory");
-    const inventory = {name:"Mahiya Mahi", email: "mahiya@gmail.com"};
-    const result = await inventoryCollecttion.insertOne(inventory);
-    console.log(`user id ${result.insertedId}`);
+   
+    // get inventory items 
+    app.get('/inventory', async(req, res) => {
+      const query = {};
+      const cursor = inventoryCollecttion.find(query);
+      const inventories = await cursor.toArray();
+      res.send(inventories);
+    })
 
    }
    finally{
