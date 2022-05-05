@@ -28,16 +28,24 @@ async function run() {
     app.get('/inventory', async(req, res) => {
       const query = {};
       const cursor = inventoryCollecttion.find(query);
-      const inventories = await cursor.toArray();
+      const inventories = await cursor.limit(6).toArray();
       res.send(inventories);
     })
     // get inventer single item
-    app.get('/inventory/:id', async (req, res) => {
+    app.get('/InventoryItem/:id', async (req, res) => {
       const id = req.params.id;
       const query = {_id: ObjectId(id)};
       const result = await inventoryCollecttion.findOne(query);
       res.send(result);
     })
+
+   //get manage items 
+   app.get('/manageItems', async (req, res) => {
+       const query = {}
+       const cursor = inventoryCollecttion.find(query)
+       const manageItems = await cursor.toArray();
+       res.send(manageItems)
+   })
 
    }
    finally{
