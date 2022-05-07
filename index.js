@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -23,7 +24,38 @@ async function run() {
    try{
     await client.connect();
     const inventoryCollecttion = client.db("groceryStore").collection("inventory");
-   
+    const MyCollecttion = client.db("groceryStore").collection("MyItem");
+     
+    // Auth 
+    app.post('/login',async(req, res) => {
+       const user = req.body;
+       const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn:'1d'});
+       res.send({accessToken})
+    })
+
+    // post my item 
+    app.post('/myItem',async (req, res) => {
+        const myItem = req.body
+        const result = await MyCollecttion.insertOne(myItem)
+        res.send(result)
+    })
+    // get my item api 
+    app.get('/myItem', async(req, res) => {
+      const query = {};
+      const cursor = MyCollecttion.find(query)
+      const myItems = await cursor.toArray();
+      res.send(myItems)
+    })
+
+    //delete 
+    app.delete('/myItem/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)};
+      const result = await MyCollecttion.deleteOne(query);
+      res.send(result);
+    })
+
+
     // get inventory items 
     app.get('/inventory', async(req, res) => {
       const query = {};
